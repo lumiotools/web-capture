@@ -14,11 +14,11 @@ export const handleWebsiteCapture = async (req, res) => {
   }
 
   const safeFileName = url.replace(/[^a-z0-9]/gi, "_").toLowerCase();
-  const screenshotPath = path.join("captures", `${safeFileName}.png`);
+  const screenshotPath = path.join("captures", `${safeFileName}.webp`);
 
   // Check if the screenshot already exists
   if (fs.existsSync(screenshotPath)) {
-    const publicUrl = `/captures/${safeFileName}.png`; // Assuming public folder setup
+    const publicUrl = `/captures/${safeFileName}.webp`; // Assuming public folder setup
     return res.status(200).json({
       success: true,
       data: publicUrl,
@@ -32,16 +32,16 @@ export const handleWebsiteCapture = async (req, res) => {
 
   try {
     const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 720 });
+    await page.setViewport({ width: 1080, height: 608 });
     await page.goto(url, { timeout: 60000 });
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Capture screenshot and save it
-    await page.screenshot({ path: screenshotPath });
+    await page.screenshot({ path: screenshotPath, type: "webp" });
 
     await browser.close();
 
-    const publicUrl = `/captures/${safeFileName}.png`;
+    const publicUrl = `/captures/${safeFileName}.webp`;
 
     return res.status(200).json({
       success: true,
