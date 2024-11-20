@@ -28,13 +28,12 @@ export const handleWebsiteCapture = async (req, res) => {
   puppeteer.use(StealthPlugin());
   const browser = await puppeteer.launch({
     args: ["--disable-http2"],
-    timeout: 60000,
   });
 
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720 });
-    await page.goto(url);
+    await page.goto(url, { timeout: 60000 });
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Capture screenshot and save it
