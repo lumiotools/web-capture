@@ -33,8 +33,8 @@ export const handleWebsiteCapture = async (req, res) => {
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720 });
-    await page.goto(url, { waitUntil: "networkidle2" });
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await page.goto(url);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Capture screenshot and save it
     await page.screenshot({ path: screenshotPath });
