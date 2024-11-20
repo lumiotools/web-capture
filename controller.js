@@ -1,13 +1,30 @@
-import fs from "fs";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import path from "path";
+import fs from "fs";
 
 export const handleWebsiteCapture = async (req, res) => {
   const { url } = req.query;
 
   if (!url) {
-    return res.status(400).send("Error: URL parameter is required.");
+    return res.status(400).json({
+      success: false,
+      message: "Error: URL parameter is required.",
+    });
   }
+
+  const safeFileName = url.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+  const screenshotPath = path.join("captures", `${safeFileName}.png`);
+
+  // Check if the screenshot already exists
+  if (fs.existsSync(screenshotPath)) {
+    const publicUrl = `/captures/${safeFileName}.png`; // Assuming public folder setup
+    return res.status(200).json({
+      success: true,
+      data: publicUrl,
+    });
+  }
+
   puppeteer.use(StealthPlugin());
   const browser = await puppeteer.launch({
     args: ["--disable-http2"],
@@ -19,26 +36,24 @@ export const handleWebsiteCapture = async (req, res) => {
     await page.goto(url, { waitUntil: "networkidle2" });
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    const screenshotBuffer = await page.screenshot();
+    // Capture screenshot and save it
+    await page.screenshot({ path: screenshotPath });
 
     await browser.close();
 
-    res.writeHead(200, {
-      "Content-Type": "image/png",
-      "Content-Length": screenshotBuffer.length,
+    const publicUrl = `/captures/${safeFileName}.png`;
+
+    return res.status(200).json({
+      success: true,
+      data: { captureUrl: publicUrl },
     });
-    res.end(screenshotBuffer);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     await browser.close();
 
-    const svgPath = "website-screenshot-error.svg";
-
-    const readStream = fs.createReadStream(svgPath);
-    res.writeHead(200, {
-      "Content-Type": "image/svg+xml",
+    res.status(500).json({
+      success: false,
+      message: "An unexpected error occurred.",
     });
-
-    readStream.pipe(res);
   }
 };
