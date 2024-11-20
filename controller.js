@@ -45,7 +45,7 @@ export const handleWebsiteCapture = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: { captureUrl: publicUrl },
+      data: publicUrl,
     });
   } catch (error) {
     console.log(error);
