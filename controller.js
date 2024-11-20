@@ -29,17 +29,25 @@ export const handleWebsiteCapture = async (req, res) => {
   const browser = await puppeteer.launch({
     args: ["--disable-http2"],
   });
+  console.log("Browser launched");
 
   try {
+    console.log("Capturing screenshot for", url);
     const page = await browser.newPage();
+    console.log("New page created");
     await page.setViewport({ width: 1080, height: 608 });
+    console.log("Viewport set");
     await page.goto(url, { timeout: 60000 });
+    console.log("Page loaded");
     await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log("Waited for 2 seconds");
 
     // Capture screenshot and save it
     await page.screenshot({ path: screenshotPath, type: "webp" });
+    console.log("Screenshot captured");
 
     await browser.close();
+    console.log("Browser closed");
 
     const publicUrl = `/captures/${safeFileName}.webp`;
 
