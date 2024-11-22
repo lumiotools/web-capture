@@ -27,21 +27,30 @@ if (!fs.existsSync(screenshotsDir)) {
 
 const carrierUrls = JSON.parse(
   fs.readFileSync("data/extended_scraped_data.json", "utf-8")
-).map(({ url }) => ({ filename: formatUrl(url).replace("/", "-"), url: url }));
+).map(({ url }) => ({
+  filename: formatUrl(url).replaceAll("/", "-"),
+  url: url,
+}));
 
 const auditCompanyUrls = JSON.parse(
   fs.readFileSync("data/audit_companies_data.json", "utf-8")
-).map(({ url }) => ({ filename: formatUrl(url).replace("/", "-"), url: url }));
+).map(({ url }) => ({
+  filename: formatUrl(url).replaceAll("/", "-"),
+  url: url,
+}));
 
 const rateShippingEngineUrls = JSON.parse(
   fs.readFileSync("data/rate_shipping_engines_data.json", "utf-8")
-).map(({ url }) => ({ filename: formatUrl(url).replace("/", "-"), url: url }));
+).map(({ url }) => ({
+  filename: formatUrl(url).replaceAll("/", "-"),
+  url: url,
+}));
 
 const allUrls = [
   ...carrierUrls,
   ...auditCompanyUrls,
   ...rateShippingEngineUrls,
-];
+].slice(0, 100);
 
 console.log(allUrls.length);
 
@@ -54,6 +63,7 @@ const captureScreenshots = async (urls) => {
   let i = 0;
 
   for (const { filename, url } of urls) {
+    i++;
     const filePath = path.join(screenshotsDir, `${filename}.webp`);
 
     // Skip if the screenshot already exists
@@ -77,8 +87,6 @@ const captureScreenshots = async (urls) => {
     } catch (error) {
       console.error(`Error capturing screenshot for ${url}:`, error.message);
     }
-
-    i++;
   }
 
   await browser.close();
