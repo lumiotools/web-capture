@@ -41,7 +41,7 @@ const allUrls = [
   ...carrierUrls,
   ...auditCompanyUrls,
   ...rateShippingEngineUrls,
-];
+].slice(100,200);
 
 console.log(allUrls.length);
 
