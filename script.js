@@ -28,21 +28,21 @@ if (!fs.existsSync(screenshotsDir)) {
 const carrierUrls = JSON.parse(
   fs.readFileSync("data/extended_scraped_data.json", "utf-8")
 ).map(({ url }) => ({
-  filename: formatUrl(url).replaceAll("/", "-"),
+  filename: formatUrl(url).replaceAll("/", "_"),
   url: url,
 }));
 
 const auditCompanyUrls = JSON.parse(
   fs.readFileSync("data/audit_companies_data.json", "utf-8")
 ).map(({ url }) => ({
-  filename: formatUrl(url).replaceAll("/", "-"),
+  filename: formatUrl(url).replaceAll("/", "_"),
   url: url,
 }));
 
 const rateShippingEngineUrls = JSON.parse(
   fs.readFileSync("data/rate_shipping_engines_data.json", "utf-8")
 ).map(({ url }) => ({
-  filename: formatUrl(url).replaceAll("/", "-"),
+  filename: formatUrl(url).replaceAll("/", "_"),
   url: url,
 }));
 
@@ -50,9 +50,10 @@ const allUrls = [
   ...carrierUrls,
   ...auditCompanyUrls,
   ...rateShippingEngineUrls,
-].slice(100,200);
+]
 
-console.log(allUrls.length);
+const uniqueUrls = Array.from(new Map(allUrls.map(item => [item.url, item])).values())
+
 
 const captureScreenshots = async (urls) => {
   const browser = await puppeteer.launch({
@@ -93,8 +94,8 @@ const captureScreenshots = async (urls) => {
   console.log("All screenshots captured.");
 };
 
-console.log(`Total urls: ${allUrls.length}`);
+console.log(`Total urls: ${uniqueUrls.length}`);
 
-captureScreenshots(allUrls).catch((error) => {
+captureScreenshots(uniqueUrls).catch((error) => {
   console.error("Error in script execution:", error.message);
 });
